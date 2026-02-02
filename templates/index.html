@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculator</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<div class="calc">
+    <div class="display" id="display">0</div>
+
+    <div class="grid">
+        <button onclick="press('7')">7</button>
+        <button onclick="press('8')">8</button>
+        <button onclick="press('9')">9</button>
+        <button class="op" onclick="press('+')">+</button>
+        <button class="side" onclick="back()">Back</button>
+
+        <button onclick="press('4')">4</button>
+        <button onclick="press('5')">5</button>
+        <button onclick="press('6')">6</button>
+        <button class="op" onclick="press('-')">−</button>
+        <button class="side" onclick="ans()">Ans</button>
+
+        <button onclick="press('1')">1</button>
+        <button onclick="press('2')">2</button>
+        <button onclick="press('3')">3</button>
+        <button class="op" onclick="press('*')">×</button>
+        <button class="side hidden"></button>
+
+        <button onclick="press('0')">0</button>
+        <button onclick="press('.')">.</button>
+        <button onclick="clearAll()">AC</button>
+        <button class="op" onclick="press('/')">÷</button>
+        <button class="side hidden"></button>
+
+
+        <button class="wide" onclick="calculate()">=</button>
+    </div>
+</div>
+
+<script>
+let expression = "";
+let lastAnswer = "";
+
+const display = document.getElementById("display");
+
+function updateDisplay(value) {
+    display.innerText = value || "0";
+}
+
+function press(val) {
+    expression += val;
+    updateDisplay(expression);
+}
+
+function back() {
+    expression = expression.slice(0, -1);
+    updateDisplay(expression);
+}
+
+function clearAll() {
+    expression = "";
+    updateDisplay("0");
+}
+
+function ans() {
+    if (lastAnswer !== "") {
+        expression += lastAnswer;
+        updateDisplay(expression);
+    }
+}
+
+function calculate() {
+    if (!expression) return;
+
+    fetch("/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expression })
+    })
+    .then(res => res.json())
+    .then(data => {
+        lastAnswer = data.result;
+        expression = "";
+        updateDisplay(lastAnswer);
+    });
+}
+</script>
+
+
+
+</body>
+</html>
